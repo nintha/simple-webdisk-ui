@@ -1,8 +1,8 @@
 import React from 'react'
-import { Layout, Menu, Breadcrumb } from 'antd'
+import { Layout, Menu  } from 'antd'
 import FileManager from './FileManager'
 
-const { Header, Content, Footer } = Layout
+const { Header, Content } = Layout
 const MainLayout: React.FC = () => {
     return (
         <Layout className="layout">
@@ -20,10 +20,6 @@ const MainLayout: React.FC = () => {
                 </Menu>
             </Header>
             <Content style={{ padding: '0 50px', minHeight: '200px' }}>
-                <Breadcrumb style={{ margin: '16px 0' }}>
-                    <Breadcrumb.Item>system</Breadcrumb.Item>
-                    <Breadcrumb.Item>etc</Breadcrumb.Item>
-                </Breadcrumb>
                 <div style={{ background: '#fff', padding: '0px 24px' }}>
                     <FileManager />
                 </div>
