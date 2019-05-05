@@ -1,11 +1,20 @@
 import React from 'react';
-import MainLayout from './component/MainLayout';
 import './App.css';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import MainLayout from './component/MainLayout';
+import LoginPage from './component/LoginPage';
 
 const App: React.FC = () => {
+
+
   return (
     <div className="App">
-      <MainLayout></MainLayout>
+      <Router>
+        <Switch>
+          <Route exact path="/" component={LoginPage} />
+          <Route path="/main" component={MainLayout} />
+        </Switch>
+      </Router>
     </div>
   );
 }

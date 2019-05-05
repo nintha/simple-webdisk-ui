@@ -3,9 +3,17 @@ import { List, Icon, Upload, Button, message, Modal, Popconfirm, Input, Breadcru
 import { UploadChangeParam } from '../../node_modules/antd/lib/upload/interface'
 import QueryString from 'querystring'
 import Moment from 'moment'
+import { Redirect } from 'react-router-dom';
+import { thisExpression } from '@babel/types';
 
 const ButtonGroup = Button.Group
 const Dragger = Upload.Dragger
+
+interface Results<T> {
+  code: number
+  message: string
+  data: T
+}
 
 interface StorageNode {
   id: string
@@ -54,14 +62,13 @@ const buildUploadProps = (parentId: string) => {
   }
 }
 
-const fetchFileList = (parentId: string): Promise<StorageNode[]> => {
+const fetchFileList = (parentId: string): Promise<Results<StorageNode[]>> => {
   const params = {
     parentId: parentId
   }
   const url = '/api/v1/storage/nodes/byParentId?' + QueryString.stringify(params)
   return fetch(url)
     .then(res => res.json())
-    .then(res => res.data)
 }
 
 const fetchFileDetail = (id: string): Promise<StorageNode> => {
@@ -138,7 +145,7 @@ const FileManager: React.FC = () => {
   const [files, setFiles] = useState<StorageNode[]>([])
   const [renameModelMap, setRenameModelMap] = useState<Map<string, boolean>>(new Map())
   const [uploadModalVisable, setUploadModalVisable] = useState<boolean>(false)
-
+  const [unlogin, setUnlogin] = useState(false)
   /**
    * 开关Modal
    * @param nodeId 节点ID
@@ -150,26 +157,36 @@ const FileManager: React.FC = () => {
 
   useEffect(() => {
     fetchFileList(parentId)
+      .then(result => {
+        if (result.code > 0) {
+          setUnlogin(true)
+          throw 'unlogin'
+        } else {
+          return result.data
+        }
+      })
       .then((list: StorageNode[]) => {
         setFiles(list)
+        fetchAncestor(parentId).then(list => {
+          list.unshift(ROOT_NODE)
+          if (parentId !== ROOT_ID) {
+            fetchFileDetail(parentId).then(node => {
+              list.push(node)
+              setDirPath(list)
+            })
+          } else {
+            setDirPath(list)
+          }
+        })
       })
       .catch(err => {
         message.error(`[fetch files] ${err}`)
       })
-
-    // pwd
-    fetchAncestor(parentId).then(list => {
-      list.unshift(ROOT_NODE)
-      if (parentId !== ROOT_ID) {
-        fetchFileDetail(parentId).then(node => {
-          list.push(node)
-          setDirPath(list)
-        })
-      } else {
-        setDirPath(list)
-      }
-    })
   }, [parentId])
+
+  if (unlogin) {
+    return (<Redirect to="/" />)
+  }
 
   const deleteCallback = (id: string) => {
     setFiles(files.filter(it => it.id !== id))
@@ -270,7 +287,7 @@ const FileManager: React.FC = () => {
                 placement="topRight"
                 title="Are you sure?"
                 onConfirm={() => deleteNode(item).then(it => deleteCallback(it.id))}
-                onCancel={() => {}}
+                onCancel={() => { }}
                 okText="Yes"
                 cancelText="No"
               >
