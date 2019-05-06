@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Layout, Menu } from 'antd'
+import { Layout, Menu, Icon } from 'antd'
 import FileManager from './FileManager'
 import { Redirect } from 'react-router-dom';
 
@@ -15,7 +15,7 @@ const MainLayout: React.FC = () => {
       if (!it.data.username) {
         setLogouted(true)
       }
-    })
+    }).catch(err => console.error(err))
   }, [])
 
 
@@ -29,14 +29,16 @@ const MainLayout: React.FC = () => {
   return (
     <Layout className="layout">
       <Header>
-        <div className="logo" />
+        <div style={{ float: "left", color: "white", margin: "0 20px" }}>
+          <Icon type="cloud" style={{ fontSize: "35px", marginTop: "15px" }} />
+        </div>
         <Menu
           theme="dark"
           mode="horizontal"
           defaultSelectedKeys={['1']}
           style={{ lineHeight: '64px' }}
         >
-          <Menu.Item key="1">WebDisk</Menu.Item>
+          <Menu.Item key="1">Home</Menu.Item>
           <Menu.Item key="2" onClick={logout}>Logout</Menu.Item>
         </Menu>
       </Header>

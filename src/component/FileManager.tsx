@@ -4,29 +4,10 @@ import { UploadChangeParam } from '../../node_modules/antd/lib/upload/interface'
 import QueryString from 'querystring'
 import Moment from 'moment'
 import { Redirect } from 'react-router-dom';
-import { thisExpression } from '@babel/types';
+import { Results, StorageNode } from '../type/interface';
 
 const ButtonGroup = Button.Group
 const Dragger = Upload.Dragger
-
-interface Results<T> {
-  code: number
-  message: string
-  data: T
-}
-
-interface StorageNode {
-  id: string
-  name: string
-  parentId: string
-  fileFlag: boolean
-  token: null | string
-  createTime: string
-  modifyTime: string
-  folderFlag: boolean
-  createTimeFormat: string
-  modifyTimeFormat: string
-}
 
 const ROOT_ID = 'ROOT'
 const ROOT_NAME = 'ROOT'
@@ -160,7 +141,7 @@ const FileManager: React.FC = () => {
       .then(result => {
         if (result.code > 0) {
           setUnlogin(true)
-          throw 'unlogin'
+          throw new Error('unlogin')
         } else {
           return result.data
         }
@@ -182,7 +163,7 @@ const FileManager: React.FC = () => {
       .catch(err => {
         message.error(`[fetch files] ${err}`)
       })
-  }, [parentId])
+  }, [parentId, uploadModalVisable])
 
   if (unlogin) {
     return (<Redirect to="/" />)
@@ -275,7 +256,7 @@ const FileManager: React.FC = () => {
                 {item.name}
               </span>
             }
-            description={'Updated At ' + Moment(item.modifyTime).format('YYYY-MM-DD HH:mm:ss')}
+            description={'Updated at ' + Moment(item.modifyTime).format('YYYY-MM-DD HH:mm:ss')}
           />
           <div>
             <ButtonGroup>

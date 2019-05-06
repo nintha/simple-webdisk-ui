@@ -1,9 +1,10 @@
 import React, { FormEvent, useState, useEffect } from 'react'
 import {
-  Form, Icon, Input, Button,
+  Form, Icon, Input, Button, message,
 } from 'antd';
 import { FormProps } from 'antd/lib/form/Form';
 import { Redirect } from 'react-router-dom';
+import { Results } from '../type/interface';
 
 
 const LoginPage: React.FC = (props: FormProps, context) => {
@@ -14,6 +15,8 @@ const LoginPage: React.FC = (props: FormProps, context) => {
       if (it.data.username) {
         setLogined(true)
       }
+    }).catch(err => {
+      console.error('fetch userInfo error', err)
     })
   }, [])
 
@@ -35,7 +38,13 @@ const LoginPage: React.FC = (props: FormProps, context) => {
         formData.append("username", values["username"])
         formData.append("password", values["password"])
         const res = await fetch('/api/v1/login', { method: 'post', body: formData })
-        res.json().then(it => setLogined(true));
+        res.json().then((result: Results<string>) => {
+          if (result.code > 0) {
+            message.error(result.message)
+          } else {
+            setLogined(true)
+          }
+        });
       }
     });
   }
